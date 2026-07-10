@@ -33,6 +33,22 @@ Um pedido de feature/agente passa pelas fases na ordem — cada agente é cétic
 | [extend](agents/extend.md) | evolução | Extensão cirúrgica de agente existente: uma mudança por vez, testada em isolamento, usuário na direção. | opus |
 | [review](agents/review.md) | higiene | Detecta e corrige drift entre docs, código e config. Mecânico no fix, preciso no relatório. | haiku |
 
+Estes 5 vivem em [`agents/`](agents/).
+
+---
+
+## Sistemas multi-agente
+
+Além dos 5 do lifecycle, o repo traz dois times completos que se coordenam:
+
+### [`nexus-agent-system/`](nexus-agent-system/) — orquestração cost-aware
+
+Orquestrador (`nexus`) delega a especialistas; um **`model-router`** escolhe o tier de modelo (barato vs premium) por tarefa — não queima Opus onde Haiku resolve. 8 agentes + roteamento: nexus, model-router, scout, forge, shield, pixel, herald, ledger.
+
+### [`fullstack-agent-system/`](fullstack-agent-system/) — time de dev sênior
+
+`orchestrator` (Maestro) delega a especialistas de domínio: backend, frontend, data/AI, infra/cloud, security. `probe` testa, `forge` constrói. 8 agentes + bootstrap de projeto.
+
 ---
 
 ## Os problemas que isto resolve

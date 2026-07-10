@@ -20,6 +20,11 @@ Entra só o que **serve fora do vault de origem** e é **agente** (identidade + 
 
 `@spec` → build → `@verify` → `@guard` → ship. `@review` fecha o loop de higiene; `@extend` evolui um agente existente sem quebrar o resto.
 
+## Sistemas multi-agente (subdirs)
+
+- `nexus-agent-system/` — orquestração cost-aware: `nexus` delega, `model-router` escolhe tier de modelo por tarefa. Ver `nexus-agent-system/README.md`.
+- `fullstack-agent-system/` — time de dev sênior: `orchestrator` delega a backend/frontend/data-ai/infra/security; `probe` testa; `forge` constrói. Ver `fullstack-agent-system/README.md`.
+
 ## Companion
 
 Agentes acionam skills do pack [phant0um/claude-skills](https://github.com/phant0um/claude-skills) (grill-me, debate, pre-mortem, council, diagnose). Instalar os dois p/ fluxo completo.
