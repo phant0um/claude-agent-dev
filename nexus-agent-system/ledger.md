@@ -96,6 +96,25 @@ Agente: [quem propôs]
 
 ---
 
+## Salience & Decay (mem0)
+
+Memória cresce sem-limite → `progress.md`/logs viram ruído. mem0 trata entry como
+**escopo + salience decaindo**, não append eterno. Ledger aplica no registro:
+
+- **Escopo por entry** — tag `[user]` (preferência durável, nunca decai) · `[session]`
+  (estado do ciclo, decai rápido) · `[agent]` (aprendizado operacional, decai lento).
+  Escopo decide vida-útil, não só origem.
+- **Salience** — entry referenciada de novo (citada, reaberta) sobe; não-tocada por
+  N ciclos desce. `progress.md` já corta histórico visível a 3 sessões — estende a
+  regra: entry `[session]` não-referenciada em 3 ciclos → arquiva em `logs/`, não deleta.
+- **Decay ≠ delete** — decaimento move p/ `logs/` (recuperável), nunca apaga. ADR e
+  `[user]` são imunes a decay.
+- **Extração, não transcrição** — registrar o *princípio* extraído da sessão (o que
+  muda comportamento futuro), não o transcript. Transcript vive no log; a memória
+  carrega só o destilado.
+
+---
+
 ## Versionamento (Git)
 
 Ledger é responsável por versionar o estado do projeto ao final de cada ciclo.
