@@ -1,0 +1,18 @@
+{
+  "name": "claude-agent-dev",
+  "version": "0.1.0",
+  "description": "Agents for building agents and software with Claude — spec, security, verify, extend, review lifecycle.",
+  "author": {
+    "name": "phant0um"
+  },
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "agents",
+    "subagents",
+    "spec-driven-development",
+    "security-audit",
+    "quality-gate",
+    "owasp-llm"
+  ]
+}
