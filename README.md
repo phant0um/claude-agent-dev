@@ -1,8 +1,12 @@
 # claude-agent-dev
 
-**Agentes que constroem agentes (e software) com o Claude Code.** Um lifecycle de 5 subagentes com identidade, guardrails e ciclo de vida — cada um faz uma fase e passa o bastão.
+**Um orquestrador e cinco agentes filhos para o Claude Code.** O Nexus planeja
+e delega; Shield revisa, Scout pesquisa, Forge implementa, Hill endurece
+agentes e Finder localiza. Só o Nexus escreve o resultado canônico, e cada
+filho tem subconjunto da autoridade do pai.
 
-Extraídos de um vault Obsidian que opera como SO de agentes IA. Só os agentes **genéricos** (servem fora do vault) vivem aqui.
+Extraído de um vault Obsidian que opera como SO de agentes IA, e reescrito
+para funcionar em qualquer projeto.
 
 ## Setup em 30s
 
@@ -11,83 +15,64 @@ Extraídos de um vault Obsidian que opera como SO de agentes IA. Só os agentes 
 /plugin install claude-agent-dev
 ```
 
-Invoca com `@nome` (ex: `@spec`, `@guard`).
+Comece sempre pelo Nexus: `@nexus [tarefa]`. Leia antes
+[AGENT-BASE](nexus-agent-system/AGENT-BASE.md): as regras comuns vivem ali e cada agente
+contém só o diff.
 
 ---
 
-## O lifecycle
+## Os agentes
 
-Um pedido de feature/agente passa pelas fases na ordem — cada agente é cético do anterior:
+| Agente | Trigger | Função | Modelo · effort |
+|--------|---------|--------|-----------------|
+| [nexus](agents/nexus.md) | `@nexus [tarefa]` | Orquestra: classifica, delega por TaskPacket, valida e materializa (writer único) | opus-5-5 · medium |
+| [shield](agents/shield.md) | `@shield`, revisão, segurança, deploy | Revisão crítica de segurança e arquitetura: PASS/FAIL/null com evidência | opus-5-5 · high |
+| [scout](agents/scout.md) | `@scout`, pesquise, compare | Pesquisa com fonte citada, contradições e lacunas declaradas | opus-5-5 · medium |
+| [forge](agents/forge.md) | `@forge`, implemente, refatore | Código e testes em escopo fechado; não decide arquitetura | opus-5-5 · medium |
+| [hill](agents/hill.md) | `@harden <slug>` | Endurece agente existente: eval → diagnóstico → lever, validado por McNemar | opus-5-5 · medium |
+| [finder](agents/finder.md) | `@finder`, onde está, localize | Tabela `path:linha` de todo acerto; não sintetiza | haiku-4-5 · low |
+
+## Fluxo
 
 ```
-@spec  →  (build)  →  @verify  →  @guard  →  ship
-              ↑                                 │
-           @extend ←──── @review (drift) ←──────┘
+            humano
+              │  @nexus [tarefa]
+              ▼
+            nexus ── ambíguo e caro? → grill-me → [DECISION NEEDED]
+              │  TaskPacket (objetivo · escopo · evidência · negatives)
+   ┌─────────┬┴────────┬─────────┬─────────┐
+ shield    scout     forge      hill     finder
+   └─────────┴────┬────┴─────────┴─────────┘
+                  ▼  relatório único (veredito + paths)
+            nexus valida e materializa
 ```
 
-| Agente | Fase | O que faz | Model |
-|--------|------|-----------|-------|
-| [spec](agents/spec.md) | antes de codar | Spec-driven dev: constitution → specify → clarify → plan → tasks. "Specs become executable." | opus |
-| [verify](agents/verify.md) | pós-implementação | Quality gate adversarial: valida código contra spec, behavioral contracts, bloqueia merge. Não elogia — audita. | opus |
-| [guard](agents/guard.md) | pré-deploy | Security audit: OWASP LLM Top 10 + Agentic AI Top 10 + guardrails do harness. Roda Opus por padrão — segurança não economiza token. | opus |
-| [extend](agents/extend.md) | evolução | Extensão cirúrgica de agente existente: uma mudança por vez, testada em isolamento, usuário na direção. | opus |
-| [review](agents/review.md) | higiene | Detecta e corrige drift entre docs, código e config. Mecânico no fix, preciso no relatório. | haiku |
-
-Estes 5 vivem em [`agents/`](agents/).
+Arquitetura, roteamento de modelo e policies:
+[`nexus-agent-system/`](nexus-agent-system/README.md).
 
 ---
 
-## Sistemas multi-agente
+## O que saiu
 
-Além dos 5 do lifecycle, o repo traz dois times completos que se coordenam:
-
-### [`nexus-agent-system/`](nexus-agent-system/) — orquestração cost-aware
-
-Orquestrador (`nexus`) delega a especialistas; um **`model-router`** escolhe o tier de modelo (barato vs premium) por tarefa — não queima Opus onde Haiku resolve. 8 agentes + roteamento: nexus, model-router, scout, forge, shield, pixel, herald, ledger.
-
-### [`fullstack-agent-system/`](fullstack-agent-system/) — time de dev sênior
-
-`orchestrator` (Maestro) delega a especialistas de domínio: backend, frontend, data/AI, infra/cloud, security. `probe` testa, `forge` constrói. 8 agentes + bootstrap de projeto.
-
----
-
-## Os problemas que isto resolve
-
-### O agente pula direto pro código e a spec vira dívida
-
-Sem spec formal, cada decisão de design fica implícita no código — e some. → **`@spec`** produz artefatos executáveis (contratos comportamentais, critérios de done) antes da primeira linha.
-
-### O agente elogia o próprio trabalho medíocre
-
-"Agents tend to respond by confidently praising the work — even when the quality is obviously mediocre." → **`@verify`** é o antídoto: separação deliberada entre quem constrói e quem julga. Cético por padrão.
-
-### Vulnerabilidade de LLM/agente passa pro deploy
-
-Prompt injection, secret hardcoded, tool destrutiva sem gate, excessive agency. → **`@guard`** roda pré-scan determinístico + checklists OWASP/Agentic-AI e bloqueia por severidade.
-
-### Mexer num agente que funciona quebra outra coisa
-
-→ **`@extend`** faz mudança mínima, com smoke test em isolamento, usuário decidindo a direção.
-
-### Docs dizem uma coisa, código faz outra
-
-→ **`@review`** varre e zera o drift entre documentação, código e config.
-
----
+A versão 0.1 trazia `spec`, `verify`, `guard`, `extend`, `review` e o
+`fullstack-agent-system/` (orchestrator, backend, frontend, data-ai, infra,
+security, probe, forge, project-setup), além de herald, pixel e ledger no
+nexus-agent-system. No vault de origem esses papéis viraram **skills** —
+comportamento reusável sem identidade própria — ou foram absorvidos pelos
+agentes atuais. Essas skills não são publicadas aqui.
 
 ## Companion: skills
 
-Estes agentes acionam skills de raciocínio/escrita que vivem no pack irmão **[phant0um/claude-skills](https://github.com/phant0um/claude-skills)** — `grill-me`, `debate`, `pre-mortem`, `council`, `diagnose`, `content-design`. Instala os dois p/ o fluxo completo (agente orquestra, skill executa a sub-tarefa).
+Os agentes acionam skills do pack irmão
+**[phant0um/claude-skills](https://github.com/phant0um/claude-skills)**:
+`grill-me`, `council`, `debate`, `pre-mortem`, `office-hours`, `diagnose`,
+`trace`, `content-design`, `content-design-review`, `writing-fragments`,
+`writing-shape`, `writing-great-skills`. Instale os dois para o fluxo completo
+(agente orquestra, skill executa a sub-tarefa). Skills citadas nos agentes como
+"não incluída" existem só no vault de origem.
 
-Regra de escopo: **skill** = comportamento reusável sem identidade → vai no claude-skills. **Agente** = identidade + ciclo de vida + guardrails → vai aqui.
-
----
-
-## Créditos
-
-- Spec-driven development inspirado no fluxo `.specify` (GitHub spec-kit).
-- OWASP LLM Top 10 e checklists Agentic AI Top 10 — OWASP GenAI.
-- Padrão generate/review (construtor ≠ juiz) e "surgical, tested in isolation" — comunidade Claude Code.
+Regra de escopo: **skill** = comportamento reusável sem identidade → vai no
+claude-skills. **Agente** = identidade + ciclo de vida + guardrails → vai aqui.
 
 ## Licença
 

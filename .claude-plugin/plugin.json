@@ -1,7 +1,7 @@
 {
   "name": "claude-agent-dev",
-  "version": "0.1.1",
-  "description": "Agents for building agents and software with Claude — spec, security, verify, extend, review lifecycle.",
+  "version": "0.2.0",
+  "description": "Orchestrator + 5 child agents for Claude Code — nexus delegates to shield (security review), scout (research), forge (implementation), hill (agent hardening) and finder (mechanical search), with TaskPacket contracts and human gates.",
   "author": {
     "name": "phant0um"
   },
@@ -10,9 +10,11 @@
     "claude-code",
     "agents",
     "subagents",
-    "spec-driven-development",
-    "security-audit",
-    "quality-gate",
-    "owasp-llm"
+    "orchestrator",
+    "multi-agent",
+    "task-packet",
+    "security-review",
+    "least-agency",
+    "model-routing"
   ]
 }
